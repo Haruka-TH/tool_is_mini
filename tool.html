@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>東海就學貸款試算</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700&display=swap">
+<style>
+/* 版面：上方標題與頁籤，下方左欄表單、右欄試算結果（窄螢幕改為上下排列） */
+:root{
+  --bg:#F5F6F2; --surface:#FCFDFA; --sunk:#E9EDE6; --fg:#1B2E2A; --muted:#55655E; --line:#CFD6CE;
+  --accent:#2B6E5E; --accent-fg:#F2F4EE; --warn:#A3561F; --warn-bg:#F6E8DB; --err:#B3261E;
+  --sans:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', Arial, sans-serif;
+  --serif:'Noto Serif TC', 'PMingLiU', Georgia, serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121A18; --surface:#1A2421; --sunk:#222E2A; --fg:#E6ECE8; --muted:#A3B3AC; --line:#33433E;
+  --accent:#5FB39C; --accent-fg:#0E1714; --warn:#E3A46F; --warn-bg:#33271D; --err:#F2948C; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121A18; --surface:#1A2421; --sunk:#222E2A; --fg:#E6ECE8; --muted:#A3B3AC; --line:#33433E;
+  --accent:#5FB39C; --accent-fg:#0E1714; --warn:#E3A46F; --warn-bg:#33271D; --err:#F2948C; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:24px 48px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-direction:column;gap:4px}
+.eyebrow{font-size:13px;letter-spacing:.12em;color:var(--warn);font-weight:500}
+h1{font-family:var(--serif);font-size:clamp(26px,4vw,34px);margin:0;line-height:1.3;text-wrap:balance}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tab{font:inherit;font-size:15px;background:none;border:0;border-bottom:3px solid transparent;padding:8px 14px;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--fg);border-color:var(--accent);font-weight:700}
+.tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+form{display:flex;flex-direction:column;gap:16px;min-width:0}
+fieldset{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:16px 18px 18px;margin:0;display:flex;flex-direction:column;gap:14px;min-width:0}
+legend{font-weight:700;font-size:16px;padding:0 6px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label,.lbl{font-size:14px;font-weight:500}
+.hint{font-size:12.5px;color:var(--muted)}
+.err{font-size:12.5px;color:var(--err)}
+input[type="number"],select{font:inherit;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);width:100%;font-variant-numeric:tabular-nums}
+input[aria-invalid="true"]{border-color:var(--err)}
+.choices{display:flex;flex-direction:column;gap:6px}
+.choice{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border-radius:6px;border:1px solid transparent;cursor:pointer}
+.choice:hover{background:var(--sunk)}
+.choice input{margin-top:5px;accent-color:var(--accent)}
+.choice.off{opacity:.5;cursor:not-allowed}
+.choice.off:hover{background:none}
+.choice small{display:block;color:var(--muted);font-size:12.5px}
+.sublist{margin-left:30px;display:flex;flex-direction:column;gap:6px}
+.addons{border-top:1px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.note{font-size:13px;color:var(--muted);background:var(--sunk);border-radius:6px;padding:8px 10px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg label{display:flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:14px;cursor:pointer;background:var(--bg)}
+.seg input{accent-color:var(--accent)}
+aside.result{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 16px);display:flex;flex-direction:column;gap:14px;min-width:0}
+@media (max-width:820px){aside.result{position:static}}
+.total{background:var(--accent);color:var(--accent-fg);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:2px}
+.total .k{font-size:14px;opacity:.85}
+.total .v{font-size:40px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.total .v small{font-size:16px;font-weight:500;margin-left:4px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card h2{font-size:15px;margin:0 0 8px}
+.lines{display:flex;flex-direction:column}
+.line{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:14.5px;border-bottom:1px solid var(--sunk)}
+.line:last-child{border-bottom:0}
+.line .amt{font-variant-numeric:tabular-nums;white-space:nowrap}
+.line.sum{font-weight:700;border-top:1px solid var(--line);border-bottom:0;padding-top:8px;margin-top:2px}
+.line.minus .amt{color:var(--accent)}
+.line .tag{font-size:12px;color:var(--muted);display:block}
+.notices{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.notices li{background:var(--warn-bg);color:var(--fg);border-left:3px solid var(--warn);padding:8px 10px;border-radius:4px;font-size:13.5px}
+.disclaimer{font-size:12.5px;color:var(--muted);margin:0}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:inherit;font-size:14px;padding:7px 14px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.btn:hover{background:var(--sunk)}
+.badge{display:inline-block;font-size:12px;background:var(--warn-bg);color:var(--warn);border-radius:999px;padding:1px 10px;font-weight:500}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14px}
+th,td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--sunk);font-weight:700}
+td.c{text-align:center;white-space:nowrap}
+.ok{color:var(--accent);font-weight:700}
+.no{color:var(--warn);font-weight:700}
+.group td{background:var(--sunk);font-weight:700}
+td[rowspan]{vertical-align:middle}
+@media (prefers-reduced-motion:no-preference){.total .v{transition:opacity .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">東海大學會計室 · DEMO 版</span>
+    <h1>就學貸款可貸金額試算</h1>
+    <p class="sub">依繳費單填入金額，勾選減免與補助後，下方即時算出本學期可貸金額。</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-calc" aria-selected="true" aria-controls="panel-calc">試算</button>
+    <button class="tab" role="tab" id="tab-rules" aria-selected="false" aria-controls="panel-rules">各項補助對照表</button>
+  </div>
+
+  <section id="panel-calc" role="tabpanel" aria-labelledby="tab-calc">
+    <div class="grid">
+      <form id="f" novalidate>
+        <fieldset>
+          <legend>1. 基本資料</legend>
+          <div class="row">
+            <div class="field"><label for="program">學制</label>
+              <select id="program">
+                <option value="day">日間學士班</option>
+                <option value="evening">進修學士班</option>
+                <option value="master">碩士班</option>
+              </select></div>
+            <div class="field"><label for="semester">學期</label>
+              <select id="semester">
+                <option value="1">上學期</option>
+                <option value="2">下學期</option>
+              </select></div>
+            <div class="field"><label for="income">家庭年所得</label>
+              <select id="income">
+                <option value="le70">70 萬以下</option>
+                <option value="70to90">70 萬至 90 萬</option>
+                <option value="gt90">超過 90 萬</option>
+              </select></div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>2. 學雜費（依繳費單）</legend>
+          <div class="row">
+            <div class="field"><label for="tuition" id="tuitionLbl">學費</label>
+              <input type="number" id="tuition" min="0" step="1" inputmode="numeric"><span class="err" data-for="tuition" hidden></span></div>
+            <div class="field"><label for="misc" id="miscLbl">雜費</label>
+              <input type="number" id="misc" min="0" step="1" inputmode="numeric"><span class="err" data-for="misc" hidden></span></div>
+          </div>
+          <span class="hint" id="feeHint">學費與雜費請分開填寫，部分減免只減學費。</span>
+        </fieldset>
+
+        <fieldset>
+          <legend>3. 減免與補助</legend>
+          <span class="hint">主要減免只能擇一。選「行政院減免學雜費」時，才可加選可並存的補助。</span>
+          <div class="choices" id="mainChoices">
+            <label class="choice"><input type="radio" name="main" value="none"><span>不申請減免或補助</span></label>
+            <label class="choice" id="execChoice"><input type="radio" name="main" value="exec"><span>行政院減免學雜費<small id="execNote">日間學士班每學期 17,500 元；進修學士班為學分學雜費 50%，最高 17,500 元</small></span></label>
+            <div class="sublist addons" id="addons">
+              <label class="choice" id="needAidChoice"><input type="checkbox" id="needAid"><span>弱勢助學金（學士班）<small id="needAidNote"></small></span></label>
+              <label class="choice" id="halfChoice" style="margin-left:28px"><input type="checkbox" id="needAidHalf"><span>核發 1/2<small>本學年只有一學期符合資格、下學期改申請其他補助、上學期休學後復學等情況</small></span></label>
+              <label class="choice"><input type="checkbox" id="agri"><span>農業部：農漁民子女就學獎助金<small>金額依補助單位規定</small></span></label>
+              <label class="choice"><input type="checkbox" id="alishan"><span>農業部：阿里山林鐵從業人員福利精進措施<small>金額依補助單位規定</small></span></label>
+            </div>
+            <label class="choice"><input type="radio" name="main" value="moe"><span>教育部學雜費減免<small>低收、中低收、身障、原住民、軍公教遺族等身分</small></span></label>
+            <div class="sublist" id="moeBox" hidden>
+              <select id="moeType" aria-label="教育部學雜費減免身分"></select>
+            </div>
+            <label class="choice"><input type="radio" name="main" value="other"><span>其他部會補助<small>勞動部、法務部、衛福部、文化部、退輔會、國防部等</small></span></label>
+            <div class="sublist" id="otherBox" hidden>
+              <select id="otherType" aria-label="其他部會補助項目"></select>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>4. 其他可貸項目</legend>
+          <span class="hint">可貸項目共六項：學雜費、書籍費、住宿費、學生團體保險費、電腦及網路通訊使用費、音樂指導費。</span>
+          <div class="row">
+            <div class="field"><label for="book">書籍費</label>
+              <input type="number" id="book" min="0" step="1" inputmode="numeric"><span class="hint">每學期上限 5,000 元</span><span class="err" data-for="book" hidden></span></div>
+            <div class="field"><label for="music">音樂指導費</label>
+              <input type="number" id="music" min="0" step="1" inputmode="numeric"><span class="hint">沒有請填 0</span><span class="err" data-for="music" hidden></span></div>
+          </div>
+          <div class="field">
+            <span class="lbl">住宿</span>
+            <div class="seg" role="radiogroup" aria-label="住宿">
+              <label><input type="radio" name="house" value="none">不申貸</label>
+              <label><input type="radio" name="house" value="campus">校內宿舍</label>
+              <label><input type="radio" name="house" value="off">校外租屋</label>
+            </div>
+          </div>
+          <div class="field" id="houseField">
+            <label for="housing" id="housingLbl">住宿費</label>
+            <input type="number" id="housing" min="0" step="1" inputmode="numeric">
+            <span class="hint" id="housingHint"></span><span class="err" data-for="housing" hidden></span>
+          </div>
+          <div class="row">
+            <div class="field"><label for="insurance">學生團體保險費</label>
+              <input type="number" id="insurance" min="0" step="1" inputmode="numeric"><span class="hint">預設 235 元，可修改</span><span class="err" data-for="insurance" hidden></span></div>
+            <div class="field"><label for="computer">電腦及網路通訊使用費</label>
+              <input type="number" id="computer" min="0" step="1" inputmode="numeric"><span class="hint">預設 550 元，可修改</span><span class="err" data-for="computer" hidden></span></div>
+          </div>
+        </fieldset>
+
+        <div class="btns">
+          <button type="button" class="btn" id="sample">填入範例</button>
+          <button type="button" class="btn" id="reset">清除重填</button>
+        </div>
+      </form>
+
+      <aside class="result" aria-live="polite">
+        <div class="total">
+          <span class="k">本學期可貸金額 <span id="sampleTag" class="badge" style="margin-left:6px">範例資料</span></span>
+          <span class="v" id="total">0<small>元</small></span>
+        </div>
+        <div class="card">
+          <h2>計算明細</h2>
+          <div class="lines" id="lines"></div>
+        </div>
+        <ul class="notices" id="notices"></ul>
+        <p class="disclaimer">本試算僅供參考，實際可貸金額以註冊繳費單及學校核定為準。</p>
+      </aside>
+    </div>
+  </section>
+
+  <section id="panel-rules" role="tabpanel" aria-labelledby="tab-rules" hidden>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <p class="sub">「並存」指能否與行政院減免學雜費同時申請。標示 ✕ 的項目彼此也只能擇一。</p>
+      <div class="tablewrap">
+      <table>
+        <tr><th>補助項目</th><th colspan="2">補助額度</th><th style="text-align:center">與行政院減免並存</th></tr>
+
+        <tr class="group"><td colspan="4">行政院減免學雜費</td></tr>
+        <tr><td>日間學士班</td><td colspan="2">每學期 17,500 元</td><td class="c">—</td></tr>
+        <tr><td>進修學士班</td><td colspan="2">學分學雜費 50%，最高 17,500 元</td><td class="c">—</td></tr>
+
+        <tr class="group"><td colspan="4">弱勢助學金</td></tr>
+        <tr>
+          <td rowspan="2">學士班（家庭年所得 90 萬以下，分 2 級距）
+            <span class="hint" style="display:block">上學期申請，下學期繳費單一次扣除全學年金額</span>
+          </td>
+          <td>70 萬以下</td>
+          <td>20,000 元／年</td>
+          <td rowspan="2" class="c ok">○ 可並存</td>
+        </tr>
+        <tr><td>70–90 萬</td><td>15,000 元／年</td></tr>
+        <tr><td>碩士班（家庭年所得 70 萬以下）</td><td colspan="2">依級距減免</td><td class="c no">✕ 不可</td></tr>
+
+        <tr class="group"><td colspan="4">教育部學雜費減免</td></tr>
+        <tr><td>低收入戶、重度身障</td><td colspan="2">學雜費全額</td><td class="c no">✕ 不可</td></tr>
+        <tr><td>中低收入戶、特殊境遇家庭</td><td colspan="2">學雜費 60%</td><td class="c no">✕ 不可</td></tr>
+        <tr><td>中度身障</td><td colspan="2">學雜費 70%</td><td class="c no">✕ 不可</td></tr>
+        <tr><td>輕度身障</td><td colspan="2">學雜費 40%</td><td class="c no">✕ 不可</td></tr>
+        <tr><td>原住民、軍公教遺族（給卹期滿）</td><td colspan="2">依部頒標準</td><td class="c no">✕ 不可</td></tr>
+        <tr><td>軍公教遺族（給卹期內）</td><td colspan="2">全公費／半公費</td><td class="c no">✕ 不可</td></tr>
+        <tr><td>現役軍人子女</td><td colspan="2">學費 30%</td><td class="c no">✕ 不可</td></tr>
+
+        <tr class="group"><td colspan="4">其他部會</td></tr>
+        <tr><td>農業部：農漁民子女就學獎助金</td><td colspan="2">依補助單位規定</td><td class="c ok">○ 可並存</td></tr>
+        <tr><td>農業部：阿里山林鐵從業人員福利精進措施</td><td colspan="2">依補助單位規定</td><td class="c ok">○ 可並存</td></tr>
+        <tr><td>人事行政總處、勞動部、臺北市勞動局、法務部、衛福部、文化部、退輔會、國防部等</td><td colspan="2">依補助單位規定</td><td class="c no">✕ 不可</td></tr>
+      </table>
+      </div>
+      <p class="disclaimer">資料來源：行政院減免學雜費與各項助學補助金額對照表。各項補助金額如有異動，以各部會實際補助金額為準。</p>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ===== 金額規則設定：每學年只需更新這一段 ===== */
+const RULES = {
+  execDay: 17500,            // 行政院減免：日間學士班每學期
+  execEveningRate: 0.5,      // 行政院減免：進修學士班比例
+  execCap: 17500,            // 行政院減免上限
+  needAid: { le70: 20000, '70to90': 15000 }, // 弱勢助學金（每年，下學期扣除）
+  bookCap: 5000,             // 書籍費上限
+  insurance: 235,            // 學生團體保險費預設
+  computer: 550,            // 電腦及網路使用費預設
+  moe: [
+    { id:'low',      label:'低收入戶（學雜費全額）', rate:1 },
+    { id:'midlow',   label:'中低收入戶（學雜費 60%）', rate:0.6 },
+    { id:'special',  label:'特殊境遇家庭（學雜費 60%）', rate:0.6 },
+    { id:'indig',    label:'原住民（依部頒標準）', notice:'教育部原住民學雜費減免' },
+    { id:'dis1',     label:'重度身障子女／學生（學雜費全額）', rate:1 },
+    { id:'dis2',     label:'中度身障子女／學生（學雜費 70%）', rate:0.7 },
+    { id:'dis3',     label:'輕度身障子女／學生（學雜費 40%）', rate:0.4 },
+    { id:'milFull',  label:'軍公教遺族・給卹期內（全公費）', rate:1 },
+    { id:'milHalf',  label:'軍公教遺族・給卹期內（半公費）', rate:0.5 },
+    { id:'milEnd',   label:'軍公教遺族・給卹期滿（依部頒標準）', notice:'軍公教遺族就學優待' },
+    { id:'soldier',  label:'現役軍人子女（學費 30%）', rate:0.3, base:'tuition' }
+  ],
+  other: [
+    { id:'dgpa',   label:'行政院人事行政總處：軍公教人員子女教育補助' },
+    { id:'tpe',    label:'臺北市勞動局：失業勞工子女就學費用補助' },
+    { id:'mol',    label:'勞動部：失業勞工子女就學費用補助' },
+    { id:'moj',    label:'法務部：受刑人子女就學補助' },
+    { id:'mohw',   label:'衛生福利部：單親培力計畫補助' },
+    { id:'moc',    label:'文化部：獎助在臺藝術學生就學助學金' },
+    { id:'agri',   label:'農業部：農漁民子女就學獎助金' },
+    { id:'alishan',label:'農業部：阿里山林鐵從業人員福利精進措施' },
+    { id:'vac',    label:'退輔會：退除役官兵就學補助、榮民子女就學補助' },
+    { id:'mnd',    label:'國防部：軍職人員公餘進修補助、ROTC' }
+  ]
+};
+
+const SAMPLE = { program:'day', semester:'2', income:'le70', tuition:41970, misc:13850, main:'exec',
+  needAid:true, agri:false, alishan:false, book:5000, music:0, house:'off', housing:20000,
+  insurance:RULES.insurance, computer:RULES.computer, moeType:'low', otherType:'dgpa' };
+const BLANK = { program:'day', semester:'1', income:'le70', tuition:'', misc:'', main:'none',
+  needAid:false, agri:false, alishan:false, book:'', music:0, house:'none', housing:'',
+  insurance:RULES.insurance, computer:RULES.computer, moeType:'low', otherType:'dgpa' };
+
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString('zh-TW');
+let isSample = true;
+
+// 填入下拉選單
+RULES.moe.forEach(o => $('moeType').add(new Option(o.label, o.id)));
+RULES.other.forEach(o => $('otherType').add(new Option(o.label, o.id)));
+
+function load(d){
+  ['program','semester','income','moeType','otherType'].forEach(k => $(k).value = d[k]);
+  ['tuition','misc','book','music','housing','insurance','computer'].forEach(k => $(k).value = d[k]);
+  ['needAid','agri','alishan'].forEach(k => $(k).checked = d[k]);
+  $('needAidHalf').checked = false;
+  document.querySelector(`input[name=main][value=${d.main}]`).checked = true;
+  document.querySelector(`input[name=house][value=${d.house}]`).checked = true;
+}
+
+// 讀取金額欄位：空白視為 0，負數或小數視為錯誤
+function num(id, required){
+  const el = $(id), errEl = document.querySelector(`.err[data-for=${id}]`);
+  const raw = el.value.trim();
+  let msg = '';
+  if (raw === '') { if (required) msg = ''; }
+  else if (!/^\d+$/.test(raw)) msg = '請輸入 0 或正整數';
+  el.setAttribute('aria-invalid', msg ? 'true' : 'false');
+  if (errEl){ errEl.textContent = msg; errEl.hidden = !msg; }
+  return msg ? null : (raw === '' ? 0 : parseInt(raw, 10));
+}
+
+function setOff(choiceEl, off){
+  choiceEl.classList.toggle('off', off);
+  choiceEl.querySelector('input').disabled = off;
+}
+
+function calc(){
+  const program = $('program').value, semester = $('semester').value, income = $('income').value;
+  const isMaster = program === 'master', isEvening = program === 'evening';
+  const notices = [];
+
+  // 學制相關的欄位標籤
+  $('tuitionLbl').textContent = isEvening ? '學分費' : '學費';
+  $('miscLbl').textContent = isEvening ? '學分雜費' : '雜費';
+  $('feeHint').textContent = isEvening ? '進修學士班請填繳費單上的學分學雜費。' : '學費與雜費請分開填寫，部分減免只減學費。';
+
+  // 碩士班不適用行政院減免
+  setOff($('execChoice'), isMaster);
+  $('execNote').textContent = isMaster ? '碩士班不適用行政院減免學雜費'
+    : '日間學士班每學期 17,500 元；進修學士班為學分學雜費 50%，最高 17,500 元';
+  if (isMaster && document.querySelector('input[name=main]:checked').value === 'exec')
+    document.querySelector('input[name=main][value=none]').checked = true;
+
+  const main = document.querySelector('input[name=main]:checked').value;
+  $('moeBox').hidden = main !== 'moe';
+  $('otherBox').hidden = main !== 'other';
+
+  // 可並存補助只在選了行政院減免時開放
+  const addonsOn = main === 'exec';
+  $('addons').querySelectorAll('.choice').forEach(c => setOff(c, !addonsOn));
+  const needAidOk = addonsOn && !isMaster && income !== 'gt90';
+  setOff($('needAidChoice'), !needAidOk);
+  $('needAidNote').textContent = !addonsOn ? '需先選擇「行政院減免學雜費」'
+    : isMaster ? '碩士班不可與行政院減免並存'
+    : income === 'gt90' ? '家庭年所得超過 90 萬，不符弱勢助學金資格'
+    : '上學期申請，下學期繳費單一次扣除全學年金額（70 萬以下 20,000 元；70–90 萬 15,000 元）';
+  if (!needAidOk) $('needAid').checked = false;
+  setOff($('halfChoice'), !$('needAid').checked);
+  if (!$('needAid').checked) $('needAidHalf').checked = false;
+  if (!addonsOn){ $('agri').checked = false; $('alishan').checked = false; }
+
+  // 住宿
+  const house = document.querySelector('input[name=house]:checked').value;
+  $('houseField').hidden = house === 'none';
+  $('housingLbl').textContent = house === 'off' ? '校外住宿費（租金）' : '校內宿舍費';
+  $('housingHint').textContent = house === 'off'
+    ? `以校內宿舍最高費用之 1.5 倍為上限`
+    : '請填繳費單上扣除住宿補貼後的金額';
+
+  const tuition = num('tuition'), misc = num('misc'), book = num('book'), music = num('music'),
+        housing = house === 'none' ? 0 : num('housing'), ins = num('insurance'), comp = num('computer');
+  if ([tuition, misc, book, music, housing, ins, comp].includes(null)){
+    $('total').innerHTML = '—<small>請修正欄位</small>';
+    return;
+  }
+
+  const fees = tuition + misc;
+  const lines = [];
+  lines.push({ k: isEvening ? '學分學雜費' : '學費＋雜費', v: fees, tag: `${fmt(tuition)}＋${fmt(misc)}` });
+
+  // 減免與補助
+  let deduct = 0;
+  const minus = (k, v, tag) => { deduct += v; lines.push({ k, v: -v, tag, minus: true }); };
+
+  if (main === 'exec'){
+    const v = isEvening ? Math.min(Math.round(fees * RULES.execEveningRate), RULES.execCap)
+                        : Math.min(RULES.execDay, fees);
+    minus('行政院減免學雜費', v);
+    if ($('needAid').checked){
+      const half = $('needAidHalf').checked;
+      const amt = half ? Math.round(RULES.needAid[income] / 2) : RULES.needAid[income];
+      if (semester === '2'){
+        minus('弱勢助學金', amt, half ? '全學年金額 × 1/2' : '全學年金額，下學期一次扣除');
+        notices.push('弱勢助學金不補助延長修業年限、重修及補修費用；全學年實際繳納學雜費低於補助金額時，只補助實際繳納數。');
+      } else notices.push(`弱勢助學金請於本學期（上學期）申請，${fmt(amt)} 元會在下學期註冊繳費單一次扣除，本學期不計入。`);
+      notices.push('轉學、休學、退學等情況的弱勢助學金核發方式，請洽學務處生活輔導組。');
+    }
+    if ($('agri').checked) notices.push('農漁民子女就學獎助金：金額依補助單位規定，請洽農業部確認。實際可貸金額會再扣除此項補助，試算金額可能偏高。');
+    if ($('alishan').checked) notices.push('阿里山林鐵從業人員福利精進措施：金額依補助單位規定，請洽農業部林業及自然保育署確認。實際可貸金額會再扣除此項補助，試算金額可能偏高。');
+  } else if (main === 'moe'){
+    const o = RULES.moe.find(x => x.id === $('moeType').value);
+    if (o.notice) notices.push(`${o.label.replace(/（.*）/, '')}：減免金額依部頒標準，請洽學務處生活輔導組確認。實際可貸金額會再扣除此項減免，試算金額可能偏高。`);
+    else {
+      const base = o.base === 'tuition' ? tuition : fees;
+      minus('教育部學雜費減免', Math.round(base * o.rate), o.label);
+    }
+  } else if (main === 'other'){
+    const o = RULES.other.find(x => x.id === $('otherType').value);
+    if (o.amount) minus(o.label.split('：')[1].replace(/（.*）/, ''), o.amount);
+    else notices.push(`${o.label}：金額依補助單位規定，請洽該單位確認。實際可貸金額會再扣除此項補助，試算金額可能偏高。`);
+  }
+
+  if (deduct > fees){
+    notices.push(`減免與補助合計 ${fmt(deduct)} 元，超過學雜費，學雜費部分以 0 元計。`);
+    deduct = fees;
+  }
+  const feesDue = fees - deduct;
+  lines.push({ k: '應繳學雜費', v: feesDue, sum: true });
+
+  // 加貸項目
+  const bookV = Math.min(book, RULES.bookCap);
+  if (book > RULES.bookCap) notices.push(`書籍費超過上限，以 ${fmt(RULES.bookCap)} 元計算。`);
+  let houseV = housing;
+  if (house === 'off' && RULES.offCampusCap && housing > RULES.offCampusCap){
+    houseV = RULES.offCampusCap;
+    notices.push(`校外住宿費超過上限，以 ${fmt(RULES.offCampusCap)} 元計算。`);
+  }
+  lines.push({ k: '書籍費', v: bookV });
+  if (house !== 'none') lines.push({ k: house === 'off' ? '校外住宿費' : '校內宿舍費', v: houseV });
+  lines.push({ k: '學生團體保險費', v: ins });
+  lines.push({ k: '電腦及網路通訊使用費', v: comp });
+  lines.push({ k: '音樂指導費', v: music });
+
+  const total = feesDue + bookV + houseV + music + ins + comp;
+  lines.push({ k: '可貸金額', v: total, sum: true });
+  if (fees === 0) notices.push('尚未填寫學雜費，請依繳費單填入學費與雜費。');
+
+  $('total').innerHTML = `${fmt(total)}<small>元</small>`;
+  $('lines').innerHTML = lines.map(l => `<div class="line${l.sum ? ' sum' : ''}${l.minus ? ' minus' : ''}">
+      <span>${l.k}${l.tag ? `<span class="tag">${l.tag}</span>` : ''}</span>
+      <span class="amt">${l.v < 0 ? '−' + fmt(-l.v) : fmt(l.v)}</span></div>`).join('');
+  $('notices').innerHTML = notices.map(n => `<li>${n}</li>`).join('');
+  $('sampleTag').hidden = !isSample;
+}
+
+$('f').addEventListener('input', () => { isSample = false; calc(); });
+$('f').addEventListener('change', () => { isSample = false; calc(); });
+$('sample').addEventListener('click', () => { load(SAMPLE); isSample = true; calc(); });
+$('reset').addEventListener('click', () => { load(BLANK); isSample = false; calc(); });
+
+// 頁籤
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+  $('panel-calc').hidden = t.id !== 'tab-calc';
+  $('panel-rules').hidden = t.id !== 'tab-rules';
+}));
+
+load(SAMPLE);
+calc();
+</script>
+</body>
+</html>
